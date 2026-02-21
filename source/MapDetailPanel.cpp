@@ -929,8 +929,8 @@ void MapDetailPanel::DrawInfo()
 			else
 			{
 				double halfCompare = .5 * (commodity.high - commodity.low);
-				// Avoid divide by zero, though this really shouldn't be a problem.
-				if(halfCompare < 1)
+				// Avoid divide by zero or negative range (data error).
+				if(halfCompare <= 0.)
 					halfCompare = 1;
 				RingShader::Draw(uiPoint + Point(143, 8), OUTER, INNER,
 					MapColor((value - (commodity.low + halfCompare)) / halfCompare));
