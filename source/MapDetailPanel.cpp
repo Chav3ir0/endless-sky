@@ -296,6 +296,10 @@ bool MapDetailPanel::KeyDown(SDL_Keycode key, Uint16 mod, const Command &command
 		vector<const System *> &plan = player.TravelPlan();
 		plan.erase(plan.begin());
 		Select(plan.empty() ? player.GetSystem() : plan.front());
+		// If the previously selected planet no longer belongs to the newly
+		// selected system, clear the selection to avoid stale UI state.
+		if(selectedPlanet && !selectedPlanet->IsInSystem(selectedSystem))
+			selectedPlanet = nullptr;
 	}
 	else if(key == SDLK_DOWN)
 	{
