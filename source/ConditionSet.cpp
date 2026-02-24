@@ -614,10 +614,10 @@ bool ConditionSet::ParseChildren(const DataNode &node)
 	for(const DataNode &child : node)
 	{
 		children.emplace_back(conditions);
-		children.back().ParseFromStart(child);
-
-		if(children.back().expressionOperator == ExpressionOp::INVALID)
-			return FailParse();
+		// Check the return value of ParseFromStart so that partially-constructed
+		// sub-trees (where FailParse ran on a grandchild) are not silently accepted.
+		if(!children.back().ParseFromStart(child))
+			return FailParse(child, "Invalid condition expression");
 	}
 
 	return true;
@@ -681,7 +681,9 @@ bool ConditionSet::ParseMini(const DataNode &node, int &tokenNr)
 		++tokenNr;
 		break;
 	default:
-		return FailParse(node, "Expected terminal or open-bracket");
+		// The token is not a number, not a valid condition name, and not a known
+		// operator. Emit a diagnostic so the data file author can find the typo.
+		return FailParse(node, "Unrecognized token \"" + node.Token(tokenNr) + "\"");
 	}
 
 	return true;
