@@ -510,7 +510,7 @@ bool BoardingPanel::Click(int x, int y, MouseButton button, int clicks)
 		return true;
 	}
 
-	return true;
+	return false;
 }
 
 
