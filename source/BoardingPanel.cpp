@@ -308,8 +308,9 @@ bool BoardingPanel::KeyDown(SDL_Keycode key, Uint16 mod, const Command &command,
 		if(count == plunder[selected].Count())
 		{
 			plunder.erase(plunder.begin() + selected);
-			if(plunder.size() && selected == static_cast<int>(plunder.size()))
-				--selected;
+			// Clamp selected to a valid index. If the list is now empty,
+			// selected stays at 0 (CanTake will reject it via bounds check).
+			selected = plunder.empty() ? 0 : min(selected, static_cast<int>(plunder.size()) - 1);
 			scroll.SetMaxValue(max(0., 20. * plunder.size()));
 		}
 		else
@@ -737,7 +738,11 @@ void BoardingPanel::DoKeyboardNavigation(const SDL_Keycode key)
 	else if(key == SDLK_HOME)
 		selected = 0;
 	else if(key == SDLK_END)
-		selected = static_cast<int>(plunder.size() - 1);
+	{
+		// Guard against empty list: plunder.size() - 1 wraps around as size_t.
+		if(!plunder.empty())
+			selected = static_cast<int>(plunder.size()) - 1;
+	}
 	else
 	{
 		if(key == SDLK_UP)
@@ -745,7 +750,7 @@ void BoardingPanel::DoKeyboardNavigation(const SDL_Keycode key)
 		else if(key == SDLK_DOWN)
 			++selected;
 	}
-	selected = max(0, min(static_cast<int>(plunder.size() - 1), selected));
+	selected = max(0, min(static_cast<int>(plunder.size()) - 1 + plunder.empty(), selected));
 
 	// Scroll down at least far enough to view the current item.
 	double minimumScroll = max(0., 20. * selected - 200.);
