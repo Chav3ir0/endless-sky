@@ -505,7 +505,7 @@ bool BoardingPanel::Click(int x, int y, MouseButton button, int clicks)
 	// Was the click inside the plunder list?
 	if(x >= -330 && x < 20 && y >= -180 && y < 60)
 	{
-		int index = (scroll.AnimatedValue() + y - -170) / 20;
+		int index = (scroll.AnimatedValue() + y + 170) / 20;
 		if(static_cast<unsigned>(index) < plunder.size())
 			selected = index;
 		return true;
